@@ -2,14 +2,14 @@ const { gql } = require('apollo-server');
 
 
 const typeDefs = gql`
-scalar Date
+
 
 "A blog written by a user"
 
     type Blog {
         id: ID!
         title: String!
-        body: String!
+        content: String!
         author: Author!
         comments: [Comment]
         likes: Int
@@ -35,26 +35,23 @@ type Query {
 type Mutation {    
     newPost(
         title: String!,
-        body: String!,
+        content: String!,
         authorName: String!,
         authorEmail: String!
         ) : Blog,
 
-    "Update blogs"
+    "Update"
     updateBlog(id: ID!, title: String, body: String) : Blog,
+    "Delete"
+    delete(id: ID!) : String, 
 
-    "Delete blog"
+    likeBlog(id: ID!) : Blog,  
 
-    deleteBlog(id: ID!) : String,
-
-    "Like a Blog"
-    likeBlog(id: ID!) : Blog,
-
-    "Unlike a blog"
     unlikeBlog(id: ID!) : Blog,
-
-    "add comments to blogs"
-    addComment(id:ID!, comment: String!, authorName : String!, authorEmail: String!) : Blog,
+    addComment(id:ID!,
+    comment: String!,
+    authorName : String!,
+    authorEmail: String!) : Blog,
 
     "delete comment"
     deleteComment(commentID: ID!) : String,

@@ -1,38 +1,29 @@
 const { ApolloServer, gql } = require('apollo-server');
-const BlogDB = require('./mongoose_schema');
 const { MongoClient } = require("mongodb");
 const { v4: uuidv4 } = require('uuid');
-
-
 const uri = "mongodb+srv://admin:admin@cluster0.6rvcr.mongodb.net/Cluster0?retryWrites=true&w=majority";
-
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-
+const client = new MongoClient(uri, {
+                                    useNewUrlParser: true,
+                                    useUnifiedTopology: true 
+                                });
 const blogResolvers = {
     Query: {
         blogs: (parent, args, context, info) => {
             client.connect()
             const collection = client.db("Cluster0").collection("blogs");
             results = collection.find({}).toArray()
-            // client.close();
-            return results
-            // perform actions on the collection object
+            return results          
         }
     },
-
+      // mutate new Blog-post,likes,unlikes,comment 
     Mutation: {
-
         newPost(parent, args, context, info) {
-
-            const { title, body, authorName, authorEmail } = args
-
+            const { title, content, authorName, authorEmail } = args
             uid = uuidv4()
-
-            const blogObj = {
+            const myBlog = {
                 id: uid,
                 title,
-                body,
+                content,
                 author: {
                     authorName,
                     authorEmail
@@ -44,25 +35,18 @@ const blogResolvers = {
 
             client.connect()
             const collection = client.db("Cluster0").collection("blogs");
-
-            collection.insertOne(blogObj)
-
-            return blogObj
+            collection.insertOne(myBlog)
+            return myBlog
 
 
         },
 
         updateBlog(parent, args, context, info) {
-
             const { id, title, body } = args
-
             client.connect()
             const collection = client.db("Cluster0").collection("blogs");
-
             filter = { id: id }
-
             if (title !== undefined) {
-
                 const updateDoc = {
                     $set: {
                         title: title
@@ -92,7 +76,7 @@ const blogResolvers = {
 
         },
 
-        deleteBlog(parents, args, context, info) {
+        delete(parents, args, context, info) {
             const { id } = args
 
             const doc = {
@@ -102,10 +86,10 @@ const blogResolvers = {
             client.connect()
             const collection = client.db("Cluster0").collection("blogs");
             try {
-                deleteResults = collection.deleteOne(doc)
-                return "Blog deleted successfully"
+                deleted = collection.deleteOne(doc)
+                return "Post delete Successful"
             } catch (e) {
-                return `Something went wrong, error ${e}`
+                return `Error?~?~?~ , error ${e}`
             }
 
         },
@@ -117,8 +101,6 @@ const blogResolvers = {
             const collection = client.db("Cluster0").collection("blogs");
 
             filter = { id: id }
-
-            // temp = collection.findOne(filter)
 
 
             const updateDoc = {
@@ -144,9 +126,7 @@ const blogResolvers = {
             client.connect()
             const collection = client.db("Cluster0").collection("blogs");
 
-            filter = { id: id }
-
-            // temp = collection.findOne(filter)
+            filter = { id: id }         
 
 
             const updateDoc = {
@@ -165,7 +145,6 @@ const blogResolvers = {
         },
 
         addComment(parent, args, context, info) {
-
             const { id, comment, authorName, authorEmail } = args
 
             client.connect()
@@ -212,10 +191,10 @@ const blogResolvers = {
             client.connect()
             const collection = client.db("Cluster0").collection("blogs");
             try {
-                deleteResults = collection.deleteOne(doc)
+                deleted = collection.deleteOne(doc)
                 return "Comment deleted successfully"
             } catch (e) {
-                return `Something went wrong, error ${e}`
+                return `Errr Error?~, error ${e}`
             }
         }
 
